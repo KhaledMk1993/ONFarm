@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <StartupObject>ONFarm.View.App</StartupObject>
+    <ApplicationIcon>Resources/soins-de-sante.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ONFarm.ViewModel\ONFarm.ViewModel.csproj" />
+    <ProjectReference Include="..\ONFarm.Application\ONFarm.Application.csproj" />
+    <ProjectReference Include="..\ONFarm.Infrastructure\ONFarm.Infrastructure.csproj" />
+    <ProjectReference Include="..\ONFarm.Common\ONFarm.Common.csproj" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+  </ItemGroup>
+</Project>

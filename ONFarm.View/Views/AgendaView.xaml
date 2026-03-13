@@ -1,0 +1,219 @@
+<UserControl
+    x:Class="ONFarm.View.Views.AgendaView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodel="clr-namespace:ONFarm.ViewModel;assembly=ONFarm.ViewModel"
+    d:DataContext="{d:DesignInstance Type=viewmodel:AgendaViewModel}"
+    Background="{StaticResource LightGrayBrush}"
+    mc:Ignorable="d">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <TextBlock
+            Grid.Row="0"
+            Margin="0,0,0,16"
+            FontFamily="Segoe UI"
+            FontSize="22"
+            FontWeight="Bold"
+            Foreground="{StaticResource TextDarkBrush}"
+            Text="Calendrier hebdomadaire" />
+
+        <!--  Week navigation  -->
+        <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                Command="{Binding SemainePrecedenteCommand}"
+                Style="{StaticResource GhostButton}">
+
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="0,0,6,0"
+                        Kind="ChevronLeft" />
+                    <TextBlock Text="Semaine précédente" />
+                </StackPanel>
+
+            </Button>
+
+            <TextBlock
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="15"
+                FontWeight="SemiBold"
+                Foreground="{StaticResource TextDarkBrush}"
+                Text="{Binding TitreSemaine}" />
+
+            <Button
+                Grid.Column="2"
+                Margin="0,0,8,0"
+                Command="{Binding AujourdhiuCommand}"
+                Style="{StaticResource SecondaryButton}">
+
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="0,0,6,0"
+                        Kind="CalendarToday" />
+                    <TextBlock Text="Aujourd'hui" />
+                </StackPanel>
+
+            </Button>
+
+            <Button
+                Grid.Column="3"
+                Command="{Binding SemaineSuivanteCommand}"
+                Style="{StaticResource GhostButton}">
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Semaine suivante" />
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="6,0,0,0"
+                        Kind="ChevronRight" />
+                </StackPanel>
+
+            </Button>
+        </Grid>
+
+        <!--  Calendar grid  -->
+        <Border
+            Grid.Row="2"
+            Padding="0"
+            Style="{StaticResource Card}">
+            <ItemsControl ItemsSource="{Binding Jours}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="7" Rows="1" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="{StaticResource MidGrayBrush}" BorderThickness="0,0,1,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Day header  -->
+                                <Border Grid.Row="0" Padding="8,10">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="{StaticResource LightGrayBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding EstAujourdhui}" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource BrandBlueBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontFamily="Segoe UI"
+                                            FontSize="11"
+                                            Text="{Binding NomJour}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{StaticResource DarkGrayBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EstAujourdhui}" Value="True">
+                                                            <Setter Property="Foreground" Value="White" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontFamily="Segoe UI"
+                                            FontSize="20"
+                                            FontWeight="Bold"
+                                            Text="{Binding NumeroJour}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EstAujourdhui}" Value="True">
+                                                            <Setter Property="Foreground" Value="White" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <!--  Events  -->
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="4">
+                                        <!--  Ordonnances  -->
+                                        <ItemsControl ItemsSource="{Binding Ordonnances}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border
+                                                        Margin="0,2"
+                                                        Padding="6,4"
+                                                        Background="{StaticResource LightGreenBrush}"
+                                                        CornerRadius="4">
+                                                        <TextBlock
+                                                            FontFamily="Segoe UI"
+                                                            FontSize="11"
+                                                            FontWeight="SemiBold"
+                                                            Foreground="{StaticResource BrandGreenBrush}"
+                                                            Text="{Binding Patient.NomComplet}"
+                                                            TextWrapping="Wrap" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                        <!--  Rappels  -->
+                                        <ItemsControl ItemsSource="{Binding Rappels}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border
+                                                        Margin="0,2"
+                                                        Padding="6,4"
+                                                        Background="#FEF9E7"
+                                                        CornerRadius="4">
+                                                        <TextBlock
+                                                            FontFamily="Segoe UI"
+                                                            FontSize="11"
+                                                            FontWeight="SemiBold"
+                                                            Foreground="{StaticResource BrandOrangeBrush}"
+                                                            Text="{Binding Patient.NomComplet}"
+                                                            TextWrapping="Wrap" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+    </Grid>
+</UserControl>
