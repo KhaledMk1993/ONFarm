@@ -13,43 +13,62 @@ public class MainViewModel : ObservableObject
 
     private readonly PatientFormViewModel _patientFormVM;
 
-    public ObservableObject CurrentView { get => _currentView; set => SetProperty(ref _currentView, value); }
-    public string CurrentPage { get => _currentPage; set => SetProperty(ref _currentPage, value); }
+    public ObservableObject CurrentView
+    {
+        get => _currentView;
+        set => SetProperty(ref _currentView, value);
+    }
+
+    public string CurrentPage
+    {
+        get => _currentPage;
+        set => SetProperty(ref _currentPage, value);
+    }
 
     public DashboardViewModel DashboardVM { get; }
     public PatientListViewModel PatientListVM { get; }
     public AgendaViewModel AgendaVM { get; }
     public RappelsViewModel RappelsVM { get; }
+    public OrdonnanceViewModel OrdonnanceVM { get; }
 
     public IRelayCommand NavigateToDashboardCommand { get; }
     public IRelayCommand NavigateToPatientsCommand { get; }
     public IRelayCommand NavigateToAgendaCommand { get; }
     public IRelayCommand NavigateToRappelsCommand { get; }
+    public IRelayCommand NavigateToOrdonnanceCommand { get; }
 
     public MainViewModel(
         DashboardViewModel dashboardVM,
         PatientListViewModel patientListVM,
         AgendaViewModel agendaVM,
         RappelsViewModel rappelsVM,
-        PatientFormViewModel patientFormVM)
+        PatientFormViewModel patientFormVM,
+        OrdonnanceViewModel ordonnanceVM
+    )
     {
         DashboardVM = dashboardVM;
         PatientListVM = patientListVM;
         AgendaVM = agendaVM;
         RappelsVM = rappelsVM;
+        OrdonnanceVM = ordonnanceVM;
         _patientFormVM = patientFormVM;
+
         _currentView = dashboardVM;
 
+        // Events
         PatientListVM.AddPatientRequested += OnAddPatientRequested;
         PatientListVM.EditPatientRequested += OnEditPatientRequested;
         PatientListVM.OpenDetailRequested += OnOpenPatientRequested;
         _patientFormVM.SaveCompleted += OnFormSaveCompleted;
         _patientFormVM.Cancelled += OnFormCancelled;
 
+        // Navigation
         NavigateToDashboardCommand = new RelayCommand(() => Navigate(DashboardVM, "Dashboard"));
         NavigateToPatientsCommand = new RelayCommand(() => Navigate(PatientListVM, "Patients"));
         NavigateToAgendaCommand = new RelayCommand(() => Navigate(AgendaVM, "Agenda"));
         NavigateToRappelsCommand = new RelayCommand(() => Navigate(RappelsVM, "Rappels"));
+
+        NavigateToOrdonnanceCommand = new RelayCommand(() => Navigate(OrdonnanceVM, "Ordonnance"));
     }
 
     private void OnAddPatientRequested()
@@ -64,14 +83,17 @@ public class MainViewModel : ObservableObject
 
         _previousView = CurrentView;
         _previousPage = CurrentPage;
+
         Navigate(_patientFormVM, "Nouveau patient");
     }
 
     private void OnEditPatientRequested(Patient patient)
     {
         _patientFormVM.LoadPatient(patient);
+
         _previousView = CurrentView;
         _previousPage = CurrentPage;
+
         Navigate(_patientFormVM, "Modifier patient");
     }
 
@@ -84,16 +106,24 @@ public class MainViewModel : ObservableObject
     private void OnFormSaveCompleted()
     {
         RetourVuePrecedente();
-        if (_previousView is DashboardViewModel) _ = DashboardVM.LoadDataAsync();
-        else if (_previousView is PatientListViewModel) _ = PatientListVM.LoadAsync();
+
+        if (_previousView is DashboardViewModel)
+            _ = DashboardVM.LoadDataAsync();
+        else if (_previousView is PatientListViewModel)
+            _ = PatientListVM.LoadAsync();
     }
 
-    private void OnFormCancelled() => RetourVuePrecedente();
+    private void OnFormCancelled()
+    {
+        RetourVuePrecedente();
+    }
 
     private void RetourVuePrecedente()
     {
-        if (_previousView is not null) Navigate(_previousView, _previousPage);
-        else Navigate(DashboardVM, "Dashboard");
+        if (_previousView is not null)
+            Navigate(_previousView, _previousPage);
+        else
+            Navigate(DashboardVM, "Dashboard");
     }
 
     private void Navigate(ObservableObject vm, string page)

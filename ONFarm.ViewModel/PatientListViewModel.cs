@@ -1,29 +1,62 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using ONFarm.Application.Interfaces;
 using ONFarm.Domain.Entities;
-using System.Collections.ObjectModel;
 
 namespace ONFarm.ViewModel;
 
 public class PatientListViewModel : ObservableObject
 {
-    private readonly IPatientService _patientService;
     private readonly IExcelService _excelService;
+    private readonly IPatientService _patientService;
+    private List<Patient> _allPatients = [];
+    private DateTime? _filterDateDebut;
+    private DateTime? _filterDateFin;
+    private bool _isLoading;
+    private bool _isUrgentFilterActive;
+    private ObservableCollection<Patient> _patients = [];
+    private string _searchQuery = string.Empty;
 
-    // Liste complète non filtrée
-    private List<Patient> _allPatients = new();
 
-    // Liste affichée (filtrée)
-    private ObservableCollection<Patient> _patients = new();
+    public PatientListViewModel(IPatientService patientService, IExcelService excelService)
+    {
+        _patientService = patientService;
+        _excelService = excelService;
+
+        AddPatientCommand = new RelayCommand(() => AddPatientRequested?.Invoke());
+        EditPatientCommand = new RelayCommand<Patient>(p => EditPatientRequested?.Invoke(p!));
+        DeletePatientCommand = new AsyncRelayCommand<Patient>(DeletePatientAsync);
+        OpenDetailCommand = new RelayCommand<Patient>(p =>
+        {
+            if (p is not null) OpenDetailRequested?.Invoke(p);
+        });
+
+        ImportExcelCommand = new AsyncRelayCommand(ImportExcelAsync);
+        ExportExcelCommand = new AsyncRelayCommand(ExportExcelAsync);
+
+        ResetDateFilterCommand = new RelayCommand(() =>
+        {
+            _filterDateDebut = null;
+            _filterDateFin = null;
+            OnPropertyChanged(nameof(FilterDateDebut));
+            OnPropertyChanged(nameof(FilterDateFin));
+            OnPropertyChanged(nameof(IsDateFilterActive));
+            ApplyFilters();
+        });
+
+        ToggleUrgentFilterCommand = new RelayCommand(() => { IsUrgentFilterActive = !IsUrgentFilterActive; });
+
+        LoadAsync().ConfigureAwait(false);
+    }
+
     public ObservableCollection<Patient> Patients
     {
         get => _patients;
         private set => SetProperty(ref _patients, value);
     }
 
-    private string _searchQuery = string.Empty;
     public string SearchQuery
     {
         get => _searchQuery;
@@ -34,8 +67,6 @@ public class PatientListViewModel : ObservableObject
         }
     }
 
-    // Filtre date début
-    private DateTime? _filterDateDebut;
     public DateTime? FilterDateDebut
     {
         get => _filterDateDebut;
@@ -44,13 +75,11 @@ public class PatientListViewModel : ObservableObject
             if (SetProperty(ref _filterDateDebut, value))
             {
                 OnPropertyChanged(nameof(IsDateFilterActive));
-                ApplyDateFilter();
+                ApplyFilters();
             }
         }
     }
 
-    // Filtre date fin
-    private DateTime? _filterDateFin;
     public DateTime? FilterDateFin
     {
         get => _filterDateFin;
@@ -59,24 +88,34 @@ public class PatientListViewModel : ObservableObject
             if (SetProperty(ref _filterDateFin, value))
             {
                 OnPropertyChanged(nameof(IsDateFilterActive));
-                ApplyDateFilter();
+                ApplyFilters();
             }
         }
     }
 
-    // Indicateur badge "Filtre actif"
-    public bool IsDateFilterActive => FilterDateDebut.HasValue || FilterDateFin.HasValue;
+    public bool IsUrgentFilterActive
+    {
+        get => _isUrgentFilterActive;
+        set
+        {
+            if (SetProperty(ref _isUrgentFilterActive, value))
+                ApplyFilters();
+        }
+    }
 
-    private bool _isLoading;
     public bool IsLoading
     {
         get => _isLoading;
         set => SetProperty(ref _isLoading, value);
     }
 
+    public bool IsDateFilterActive => FilterDateDebut.HasValue || FilterDateFin.HasValue;
+
     public IRelayCommand AddPatientCommand { get; }
     public IRelayCommand<Patient> EditPatientCommand { get; }
     public IAsyncRelayCommand<Patient> DeletePatientCommand { get; }
+    public IRelayCommand<Patient> OpenDetailCommand { get; }
+    public IRelayCommand ToggleUrgentFilterCommand { get; }
     public IAsyncRelayCommand ImportExcelCommand { get; }
     public IAsyncRelayCommand ExportExcelCommand { get; }
     public IRelayCommand ResetDateFilterCommand { get; }
@@ -85,29 +124,6 @@ public class PatientListViewModel : ObservableObject
     public event Action<Patient>? EditPatientRequested;
     public event Action<Patient>? OpenDetailRequested;
 
-    public PatientListViewModel(IPatientService patientService, IExcelService excelService)
-    {
-        _patientService = patientService;
-        _excelService = excelService;
-
-        AddPatientCommand = new RelayCommand(() => AddPatientRequested?.Invoke());
-        EditPatientCommand = new RelayCommand<Patient>(p => EditPatientRequested?.Invoke(p!));
-        DeletePatientCommand = new AsyncRelayCommand<Patient>(DeletePatientAsync);
-        ImportExcelCommand = new AsyncRelayCommand(ImportExcelAsync);
-        ExportExcelCommand = new AsyncRelayCommand(ExportExcelAsync);
-        ResetDateFilterCommand = new RelayCommand(() =>
-        {
-            _filterDateDebut = null;
-            _filterDateFin = null;
-            OnPropertyChanged(nameof(FilterDateDebut));
-            OnPropertyChanged(nameof(FilterDateFin));
-            OnPropertyChanged(nameof(IsDateFilterActive));
-            ApplyDateFilter();
-        });
-
-        LoadAsync().ConfigureAwait(false);
-    }
-
     public async Task LoadAsync()
     {
         IsLoading = true;
@@ -115,27 +131,36 @@ public class PatientListViewModel : ObservableObject
         {
             var list = await _patientService.GetAllPatientsAsync();
             _allPatients = list.ToList();
-            ApplyDateFilter();
+            ApplyFilters();
         }
-        finally { IsLoading = false; }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
-    public async Task SearchAsync()
+    private async Task SearchAsync()
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery)) { await LoadAsync(); return; }
+        if (string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            await LoadAsync();
+            return;
+        }
 
         IsLoading = true;
         try
         {
             var results = await _patientService.SearchPatientsAsync(SearchQuery);
             _allPatients = results.ToList();
-            ApplyDateFilter();
+            ApplyFilters();
         }
-        finally { IsLoading = false; }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
-    // Applique le filtre date sur _allPatients
-    private void ApplyDateFilter()
+    private void ApplyFilters()
     {
         var filtered = _allPatients.AsEnumerable();
 
@@ -151,21 +176,32 @@ public class PatientListViewModel : ObservableObject
             filtered = filtered.Where(p => p.DateNaissance.HasValue && p.DateNaissance.Value <= fin);
         }
 
+        if (IsUrgentFilterActive)
+            filtered = filtered.Where(p => p.EstUrgentAujourdhui);
+
+        filtered = filtered.OrderBy(p => p.StatutSuivi switch
+        {
+            "Rouge" => 0,
+            "Orange" => 1,
+            "Vert" => 2,
+            _ => 3
+        });
+
         Patients = new ObservableCollection<Patient>(filtered);
     }
 
-    public void AddPatientToList(Patient patient)
+    private void AddPatientToList(Patient patient)
     {
         _allPatients.Add(patient);
-        ApplyDateFilter();
+        ApplyFilters();
     }
 
     private async Task DeletePatientAsync(Patient? p)
     {
-        if (p == null) return;
+        if (p is null) return;
         await _patientService.DeletePatientAsync(p.Id);
         _allPatients.Remove(p);
-        ApplyDateFilter();
+        ApplyFilters();
     }
 
     private async Task ImportExcelAsync()
@@ -183,13 +219,16 @@ public class PatientListViewModel : ObservableObject
         try
         {
             var imported = await _excelService.ImporterPatientsAsync(dialog.FileName);
-            foreach (var p in imported)
+            foreach (var patient in imported)
             {
-                await _patientService.AddPatientAsync(p);
-                AddPatientToList(p);
+                await _patientService.AddPatientAsync(patient);
+                AddPatientToList(patient);
             }
         }
-        finally { IsLoading = false; }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     private async Task ExportExcelAsync()
@@ -209,6 +248,9 @@ public class PatientListViewModel : ObservableObject
         {
             await _excelService.ExporterPatientsAsync(Patients, dialog.FileName);
         }
-        finally { IsLoading = false; }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 }

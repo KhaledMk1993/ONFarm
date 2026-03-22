@@ -12,6 +12,8 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
+
+        <!--  ══ Couleurs ══  -->
         <SolidColorBrush x:Key="PrimaryColor" Color="#0052CC" />
         <SolidColorBrush x:Key="PrimaryHover" Color="#0043A3" />
         <SolidColorBrush x:Key="PrimaryLight" Color="#E8F0FE" />
@@ -24,6 +26,7 @@
         <SolidColorBrush x:Key="TextSecondary" Color="#718096" />
         <SolidColorBrush x:Key="SurfaceColor" Color="#F7FAFC" />
 
+        <!--  ══ Bouton principal ══  -->
         <Style x:Key="PrimaryButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource PrimaryColor}" />
             <Setter Property="Foreground" Value="White" />
@@ -67,6 +70,7 @@
             </Setter>
         </Style>
 
+        <!--  ══ Bouton fantôme ══  -->
         <Style x:Key="GhostButton" TargetType="Button">
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
@@ -104,35 +108,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="ResetButton" TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="10,0" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Bd"
-                            Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="6">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Bd" Property="Background" Value="#FEE2E2" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <!--  ══ Bouton icône (Edit / Delete) ══  -->
         <Style x:Key="IconButton" TargetType="Button">
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
@@ -160,6 +136,7 @@
             </Setter>
         </Style>
 
+        <!--  ══ DatePicker filtre ══  -->
         <Style x:Key="FilterDatePickerStyle" TargetType="DatePicker">
             <Setter Property="Background" Value="White" />
             <Setter Property="BorderBrush" Value="#E2E8F0" />
@@ -192,7 +169,6 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <!--  PART_Button = icône calendrier bleue, WPF l'utilise pour ouvrir le popup  -->
                                 <Button
                                     x:Name="PART_Button"
                                     Grid.Column="0"
@@ -227,14 +203,12 @@
                                     </Button.Template>
                                 </Button>
 
-                                <!--  Séparateur  -->
                                 <Rectangle
                                     Grid.Column="1"
                                     Width="1"
                                     Margin="0,8"
                                     Fill="#E2E8F0" />
 
-                                <!--  Texte date sélectionnée  -->
                                 <DatePickerTextBox
                                     x:Name="PART_TextBox"
                                     Grid.Column="2"
@@ -249,7 +223,6 @@
                                     Foreground="#1A202C"
                                     IsReadOnly="True" />
 
-                                <!--  Popup géré par WPF via PART_Button  -->
                                 <Popup
                                     x:Name="PART_Popup"
                                     Grid.Column="0"
@@ -310,6 +283,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
     </UserControl.Resources>
 
     <Border Padding="32,28,32,28" Background="#F0F2F5">
@@ -321,7 +295,11 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!--  ══ Titre ══  -->
+            <!--
+                ══════════════════════════════════════════════
+                ROW 0 — Titre
+                ══════════════════════════════════════════════
+            -->
             <StackPanel
                 Grid.Row="0"
                 Margin="0,0,0,28"
@@ -363,15 +341,22 @@
                 </StackPanel>
             </StackPanel>
 
-            <!--  ══ Toolbar ══  -->
+            <!--
+                ══════════════════════════════════════════════
+                ROW 1 — Toolbar
+                ══════════════════════════════════════════════
+            -->
             <Grid Grid.Row="1" Margin="0,0,0,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <!--  Filtre urgent  -->
                 </Grid.ColumnDefinitions>
 
+                <!--  Barre de recherche  -->
                 <Border
                     Grid.Column="0"
                     Height="44"
@@ -462,6 +447,7 @@
                     </Grid>
                 </Border>
 
+                <!--  Nouveau patient  -->
                 <Button
                     Grid.Column="1"
                     Margin="0,0,8,0"
@@ -480,6 +466,7 @@
                     </StackPanel>
                 </Button>
 
+                <!--  Exporter  -->
                 <Button
                     Grid.Column="2"
                     Margin="0,0,8,0"
@@ -498,8 +485,10 @@
                     </StackPanel>
                 </Button>
 
+                <!--  Importer  -->
                 <Button
                     Grid.Column="3"
+                    Margin="0,0,8,0"
                     Command="{Binding ImportExcelCommand}"
                     Style="{StaticResource GhostButton}">
                     <StackPanel Orientation="Horizontal">
@@ -514,9 +503,86 @@
                         <TextBlock VerticalAlignment="Center" Text="Importer" />
                     </StackPanel>
                 </Button>
+
+                <!--  ══ Toggle "À appeler aujourd'hui" ══  -->
+                <Button
+                    Grid.Column="4"
+                    Height="40"
+                    Padding="16,0"
+                    Command="{Binding ToggleUrgentFilterCommand}"
+                    Cursor="Hand"
+                    FontFamily="Segoe UI"
+                    FontSize="13"
+                    FontWeight="SemiBold">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border
+                                x:Name="Bd"
+                                Padding="{TemplateBinding Padding}"
+                                BorderThickness="1.5"
+                                CornerRadius="10">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="White" />
+                                        <Setter Property="BorderBrush" Value="#E0E0E0" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsUrgentFilterActive}" Value="True">
+                                                <Setter Property="Background" Value="#FFF3CD" />
+                                                <Setter Property="BorderBrush" Value="#F59E0B" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <Ellipse
+                                        Width="10"
+                                        Height="10"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#EF4444" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsUrgentFilterActive}" Value="True">
+                                                        <Setter Property="Fill" Value="#F59E0B" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="À appeler aujourd'hui" />
+                                                <Setter Property="Foreground" Value="#718096" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsUrgentFilterActive}" Value="True">
+                                                        <Setter Property="Foreground" Value="#92400E" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Opacity" Value="0.85" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Opacity" Value="0.70" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
             </Grid>
 
-            <!--  ══ Barre filtre date ══  -->
+            <!--
+                ══════════════════════════════════════════════
+                ROW 2 — Barre filtre date de naissance
+                ══════════════════════════════════════════════
+            -->
             <Border
                 Grid.Row="2"
                 Margin="0,0,0,16"
@@ -551,7 +617,6 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  Icône calendrier  -->
                     <Border
                         Grid.Column="0"
                         Width="36"
@@ -570,7 +635,6 @@
                             Stretch="Uniform" />
                     </Border>
 
-                    <!--  Titre  -->
                     <TextBlock
                         Grid.Column="1"
                         Margin="0,0,16,0"
@@ -581,7 +645,6 @@
                         Foreground="{StaticResource TextPrimary}"
                         Text="Naissance entre" />
 
-                    <!--  Séparateur  -->
                     <Rectangle
                         Grid.Column="2"
                         Width="1"
@@ -590,7 +653,6 @@
                         VerticalAlignment="Center"
                         Fill="#E2E8F0" />
 
-                    <!--  Badge DU  -->
                     <Border
                         Grid.Column="3"
                         Margin="0,0,8,0"
@@ -606,7 +668,6 @@
                             Text="DU" />
                     </Border>
 
-                    <!--  DatePicker DU  -->
                     <DatePicker
                         Grid.Column="4"
                         Margin="0,0,12,0"
@@ -614,7 +675,6 @@
                         SelectedDate="{Binding FilterDateDebut, UpdateSourceTrigger=PropertyChanged}"
                         Style="{StaticResource FilterDatePickerStyle}" />
 
-                    <!--  Badge AU  -->
                     <Border
                         Grid.Column="5"
                         Margin="0,0,8,0"
@@ -630,14 +690,13 @@
                             Text="AU" />
                     </Border>
 
-                    <!--  DatePicker AU  -->
                     <DatePicker
                         Grid.Column="6"
                         VerticalAlignment="Center"
                         SelectedDate="{Binding FilterDateFin, UpdateSourceTrigger=PropertyChanged}"
                         Style="{StaticResource FilterDatePickerStyle}" />
 
-                    <!--  Badge filtre actif  -->
+                    <!--  Badge filtre date actif  -->
                     <Border
                         Grid.Column="7"
                         Margin="12,0,0,0"
@@ -723,7 +782,12 @@
                     </Button>
                 </Grid>
             </Border>
-            <!--  ══ DataGrid ══  -->
+
+            <!--
+                ══════════════════════════════════════════════
+                ROW 3 — DataGrid
+                ══════════════════════════════════════════════
+            -->
             <Border
                 Grid.Row="3"
                 Background="White"
@@ -737,6 +801,7 @@
                         Opacity="0.08"
                         ShadowDepth="4" />
                 </Border.Effect>
+
                 <DataGrid
                     AutoGenerateColumns="False"
                     Background="Transparent"
@@ -752,6 +817,14 @@
                     RowHeight="52"
                     SelectionMode="Single"
                     SelectionUnit="FullRow">
+
+                    <!--  Double-clic → fiche détail (full MVVM, zéro code-behind)  -->
+                    <DataGrid.InputBindings>
+                        <MouseBinding
+                            Command="{Binding OpenDetailCommand}"
+                            CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                            MouseAction="LeftDoubleClick" />
+                    </DataGrid.InputBindings>
 
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
@@ -805,6 +878,7 @@
 
                     <DataGrid.Columns>
 
+                        <!--  PATIENT  -->
                         <DataGridTextColumn
                             Width="*"
                             Binding="{Binding NomComplet}"
@@ -820,6 +894,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
+                        <!--  TÉLÉPHONE  -->
                         <DataGridTextColumn
                             Width="140"
                             Binding="{Binding Telephone}"
@@ -829,11 +904,24 @@
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                     <Setter Property="FontFamily" Value="Segoe UI" />
                                     <Setter Property="FontSize" Value="13" />
-                                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-
+                        <DataGridTextColumn
+                            Width="140"
+                            Binding="{Binding Adresse}"
+                            Header="Adresse">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="FontFamily" Value="Segoe UI" />
+                                    <Setter Property="FontSize" Value="13" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!--  DATE NAISSANCE  -->
                         <DataGridTextColumn
                             Width="150"
                             Binding="{Binding DateNaissanceAffichage}"
@@ -844,75 +932,99 @@
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                     <Setter Property="FontFamily" Value="Segoe UI" />
                                     <Setter Property="FontSize" Value="13" />
-                                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTemplateColumn Width="160" Header="DERNIÈRE FACTURE">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        FontFamily="Segoe UI"
-                                        FontSize="13">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Text" Value="{Binding DerniereFacture, StringFormat=dd/MM/yyyy}" />
-                                                <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding DerniereFacture}" Value="{x:Null}">
-                                                        <Setter Property="Text" Value="—" />
-                                                        <Setter Property="Foreground" Value="#CBD5E0" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <DataGridTemplateColumn Width="160" Header="PROCHAINE FACTURE">
+                        <!--  ══ STATUT SUIVI ══  -->
+                        <DataGridTemplateColumn
+                            Width="150"
+                            Header="STATUT SUIVI"
+                            SortMemberPath="StatutSuivi">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border
-                                        Padding="10,4"
+                                        Padding="10,5"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
                                         CornerRadius="20">
                                         <Border.Style>
                                             <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#F0FFF4" />
+                                                <Setter Property="Background" Value="#D1FAE5" />
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ProchaineFacture}" Value="{x:Null}">
-                                                        <Setter Property="Background" Value="Transparent" />
+                                                    <DataTrigger Binding="{Binding StatutSuivi}" Value="Orange">
+                                                        <Setter Property="Background" Value="#FEF3C7" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding StatutSuivi}" Value="Rouge">
+                                                        <Setter Property="Background" Value="#FEE2E2" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding StatutSuivi}" Value="Neutre">
+                                                        <Setter Property="Background" Value="#F1F5F9" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
-                                        <TextBlock
-                                            FontFamily="Segoe UI"
-                                            FontSize="12"
-                                            FontWeight="SemiBold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Text" Value="{Binding ProchaineFacture, StringFormat=dd/MM/yyyy}" />
-                                                    <Setter Property="Foreground" Value="#22863A" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ProchaineFacture}" Value="{x:Null}">
-                                                            <Setter Property="Text" Value="—" />
-                                                            <Setter Property="Foreground" Value="#CBD5E0" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <!--  Point coloré  -->
+                                            <Ellipse
+                                                Width="9"
+                                                Height="9"
+                                                Margin="0,0,7,0"
+                                                VerticalAlignment="Center">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="#10B981" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding StatutSuivi}" Value="Orange">
+                                                                <Setter Property="Fill" Value="#F59E0B" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatutSuivi}" Value="Rouge">
+                                                                <Setter Property="Fill" Value="#EF4444" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatutSuivi}" Value="Neutre">
+                                                                <Setter Property="Fill" Value="#94A3B8" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+
+                                            <!--  Label  -->
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                FontFamily="Segoe UI"
+                                                FontSize="12"
+                                                FontWeight="SemiBold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="À jour" />
+                                                        <Setter Property="Foreground" Value="#065F46" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding StatutSuivi}" Value="Orange">
+                                                                <Setter Property="Text" Value="Bientôt dû" />
+                                                                <Setter Property="Foreground" Value="#92400E" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatutSuivi}" Value="Rouge">
+                                                                <Setter Property="Text" Value="À appeler" />
+                                                                <Setter Property="Foreground" Value="#991B1B" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatutSuivi}" Value="Neutre">
+                                                                <Setter Property="Text" Value="—" />
+                                                                <Setter Property="Foreground" Value="#94A3B8" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
+                        <!--  ACTIONS  -->
                         <DataGridTemplateColumn Width="110" Header="ACTIONS">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -920,6 +1032,7 @@
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Orientation="Horizontal">
+                                        <!--  Modifier  -->
                                         <Button
                                             Width="34"
                                             Height="34"
@@ -936,6 +1049,7 @@
                                                 Fill="{StaticResource PrimaryColor}"
                                                 Stretch="Uniform" />
                                         </Button>
+                                        <!--  Supprimer  -->
                                         <Button
                                             Width="34"
                                             Height="34"
@@ -959,6 +1073,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>
+
         </Grid>
     </Border>
 </UserControl>

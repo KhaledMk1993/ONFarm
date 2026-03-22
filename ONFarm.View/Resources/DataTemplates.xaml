@@ -1,6 +1,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:global="clr-namespace:;assembly=ONFarm.ViewModel"
     xmlns:views="clr-namespace:ONFarm.View.Views"
     xmlns:vm="clr-namespace:ONFarm.ViewModel;assembly=ONFarm.ViewModel">
 
@@ -27,6 +28,10 @@
     <!--  Patient Form  -->
     <DataTemplate DataType="{x:Type vm:PatientFormViewModel}">
         <views:PatientFormView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:OrdonnanceViewModel}">
+        <views:OrdonnanceView />
     </DataTemplate>
 
 </ResourceDictionary>

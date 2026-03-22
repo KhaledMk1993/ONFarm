@@ -121,7 +121,26 @@
                                 Text="Patients" />
                         </StackPanel>
                     </Button>
-
+                    <Button
+                        Command="{Binding NavigateToOrdonnanceCommand}"
+                        Style="{StaticResource SidebarNavButton}"
+                        ToolTip="Ordonnance">
+                        <StackPanel HorizontalAlignment="Center">
+                            <materialDesign:PackIcon
+                                Width="24"
+                                Height="24"
+                                HorizontalAlignment="Center"
+                                Foreground="#AEB6BF"
+                                Kind="FileDocumentEdit" />
+                            <TextBlock
+                                Margin="0,3,0,0"
+                                HorizontalAlignment="Center"
+                                FontFamily="Segoe UI"
+                                FontSize="10"
+                                Foreground="#AEB6BF"
+                                Text="Ordonnance" />
+                        </StackPanel>
+                    </Button>
                     <Button
                         Command="{Binding NavigateToRappelsCommand}"
                         Style="{StaticResource SidebarNavButton}"

@@ -54,6 +54,7 @@ public partial class App
         services.AddSingleton<PatientFormViewModel>();
         services.AddSingleton<AgendaViewModel>();
         services.AddSingleton<RappelsViewModel>();
+        services.AddSingleton<OrdonnanceViewModel>();
         services.AddSingleton<MainViewModel>();
 
         services.AddTransient<MainWindow>();

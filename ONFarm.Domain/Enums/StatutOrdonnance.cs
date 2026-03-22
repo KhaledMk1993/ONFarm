@@ -4,6 +4,6 @@ public enum StatutOrdonnance
 {
     EnAttente,
     Prepare,
-    Manquee,
+    Bientôt,
     Livre
 }

@@ -1,5 +1,3 @@
-using ONFarm.Domain.Enums;
-
 namespace ONFarm.Domain.Entities;
 
 public class Patient
@@ -13,7 +11,7 @@ public class Patient
     public DateTime DateCreation { get; set; } = DateTime.UtcNow;
     public bool IsActive { get; set; } = true;
     public string? Notes { get; set; }
-
+    public string FullName => $"{Nom} {Prenom}";
     public ICollection<Medicament> Medicaments { get; set; } = new List<Medicament>();
     public ICollection<Ordonnance> Ordonnances { get; set; } = new List<Ordonnance>();
     public ICollection<Rappel> Rappels { get; set; } = new List<Rappel>();
@@ -25,18 +23,36 @@ public class Patient
             ? DateNaissance.Value.ToString("dd/MM/yyyy")
             : "—";
 
-    public void SetDateNaissance(DateOnly? date)
-    {
-        DateNaissance = date;
-    }
-
+    public void SetDateNaissance(DateOnly? date) => DateNaissance = date;
 
     public DateTime? DerniereFacture =>
-        Ordonnances.OrderByDescending(o => o.DateFacture)
+        Ordonnances
+            .OrderByDescending(o => o.DateFacture)
             .FirstOrDefault()?.DateFacture;
 
     public DateTime? ProchaineFacture =>
-        Ordonnances.Where(o => o.ProchainRenouvellement >= DateTime.UtcNow.Date)
+        Ordonnances
+            .Where(o => o.ProchainRenouvellement >= DateTime.UtcNow.Date)
             .OrderBy(o => o.ProchainRenouvellement)
             .FirstOrDefault()?.ProchainRenouvellement;
+
+    public string StatutSuivi
+    {
+        get
+        {
+            if (!ProchaineFacture.HasValue)
+                return "Neutre";
+
+            var jours = (ProchaineFacture.Value.Date - DateTime.Today).TotalDays;
+
+            return jours switch
+            {
+                <= 0 => "Rouge",
+                <= 7 => "Orange",
+                _ => "Vert"
+            };
+        }
+    }
+
+    public bool EstUrgentAujourdhui => StatutSuivi == "Rouge";
 }
